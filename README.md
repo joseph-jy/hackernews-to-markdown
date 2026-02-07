@@ -9,62 +9,96 @@
 - 원본 게시물의 제목과 링크를 포함
 - 댓글의 계층 구조에 따른 자동 들여쓰기
 - 로컬 파일 시스템에 Markdown 노트 저장
+- **(선택)** Inference API를 통한 원문 요약 및 댓글 한국어 번역
 
 ## 사용법 (Usage)
 
 ### 설치 (Installation)
 
-1.  **가상 환경 설정 (Virtual Environment Setup):**
-    프로젝트를 위한 격리된 Python 환경을 만듭니다.
-    ```bash
-    python3 -m venv venv
-    ```
+**방법 1: Make 사용 (권장)**
+```bash
+make install
+```
 
-2.  **가상 환경 활성화 (Activate Virtual Environment):**
-    ```bash
-    source venv/bin/activate
-    ```
-
-3.  **필수 라이브러리 설치 (Install Dependencies):**
-    `requests` (HTTP 요청) 및 `beautifulsoup4` (HTML 파싱) 라이브러리를 설치합니다.
-    ```bash
-    pip install requests beautifulsoup4
-    ```
+**방법 2: 수동 설치**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
 ### 스크립트 실행 (Running the Script)
 
-스크립트는 해커뉴스 게시물의 ID 또는 전체 URL, 그리고 저장할 Markdown 파일 경로를 인자로 받습니다.
+**방법 1: Make 사용 (권장)**
+```bash
+make scrape URL="https://news.ycombinator.com/item?id=46918612"
+```
 
+**방법 2: 직접 실행**
 ```bash
 venv/bin/python3 hn_scraper.py <HACKER_NEWS_ITEM_ID_OR_URL> -to <OUTPUT_FILE_PATH>
 ```
 
-**예시 (Example):**
-
-해커뉴스 ID `46918612`의 댓글을 `openciv3.md` 파일로 저장:
-
+**예시:**
 ```bash
+# ID로 실행
 venv/bin/python3 hn_scraper.py 46918612 -to ./openciv3.md
-```
 
-또는 전체 URL을 사용하여 저장:
-
-```bash
+# URL로 실행
 venv/bin/python3 hn_scraper.py https://news.ycombinator.com/item?id=46918612 -to ./openciv3.md
 ```
 
+### 요약/번역 기능 설정 (Optional)
+
+Inference API를 설정하면 원문 요약과 댓글 한국어 번역 기능을 사용할 수 있습니다.
+
+1. `.env.example`을 `.env`로 복사:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. `.env` 파일에 실제 API 정보 입력:
+   ```
+   INFERENCE_API_URL=https://your-api-url/v1/chat/completions
+   INFERENCE_API_KEY=your_api_key_here
+   INFERENCE_MODEL=your_model_name
+   ```
+
+3. 스크립트 실행 시 자동으로 요약 및 번역이 적용됩니다.
+
+**참고:** `.env` 파일이 없거나 설정이 불완전하면 기존처럼 원문 그대로 저장됩니다.
+
 ## 코드 구조 (Code Structure)
 
--   `hn_scraper.py`: 핵심 스크래핑 및 Markdown 변환 로직을 포함하는 Python 스크립트.
+| 파일 | 설명 |
+|------|------|
+| `hn_scraper.py` | 핵심 스크래핑 및 Markdown 변환 스크립트 |
+| `Makefile` | 간편 실행을 위한 Make 타겟 |
+| `.env.example` | 환경 변수 설정 템플릿 |
+| `requirements.txt` | Python 의존성 목록 |
 
-## 변환 구조 예시 (Example Markdown Output)
+## 출력 형식 (Output Format)
 
+### 기본 출력 (Inference API 미설정)
 ```markdown
-# [OpenCiv3: Open-source, cross-platform reimagining of Civilization III](https://openciv3.org/)
+# [제목](링크)
 
-- “Mac will try hard not to let you run this; it will tell you the app is damaged and can’t be opened and helpfully offer to trash it for you. From a terminal you can xattr -cr /path/to/OpenCiv3.app to enable running it.”
-How far OSX has come since the days of the “cancel or allow” parody advert.
-    - Mac support is the bane of my existence. It doesn't help that none of us core contributors have one, so if anyone is willing to be a lab monkey...
-        - I have a Macbook Pro M4 Max, an Apple Developer account, a bit of time, and some enthusiasm. Would love to help!
+## 댓글
+
+- 댓글 1
+    - 답글 1
 ```
-(실제 출력은 더 많은 댓글과 계층 구조를 포함합니다.)
+
+### 확장 출력 (Inference API 설정됨)
+```markdown
+# [제목](링크)
+
+## 요약
+
+원문 요약 내용...
+
+## 댓글
+
+- 번역된 댓글 1
+    - 번역된 답글 1
+```
