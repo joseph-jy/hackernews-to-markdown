@@ -308,6 +308,14 @@ def main():
             f.write(markdown_content)
         print(f"Successfully saved comments to {args.output}")
 
+        # 원문 그대로 (요약/번역 없이) _orig.md 파일로 저장
+        orig_markdown = convert_to_markdown(article_info, comments)
+        base, ext = os.path.splitext(args.output)
+        orig_output = f"{base}_orig{ext}"
+        with open(orig_output, "w", encoding="utf-8") as f:
+            f.write(orig_markdown)
+        print(f"Successfully saved original comments to {orig_output}")
+
     except ValueError as e:
         print(f"Error: {e}")
     except requests.exceptions.RequestException as e:
