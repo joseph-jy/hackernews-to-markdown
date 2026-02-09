@@ -1,6 +1,7 @@
 .DS_Store
 venv/
 output.md
+output_orig.md
 .swp
 .env
 
